@@ -1,8 +1,3 @@
-import java.net.URL
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.FileOutputStream
-
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
@@ -123,61 +118,5 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.tooling)
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
-}
-
-tasks.register("downloadRepo") {
-  doLast {
-    val url = URL("https://github.com/SUDEEPBOTS/UIO-TRAIN/archive/refs/heads/main.zip")
-    val zipFile = file("${rootDir}/repo.zip")
-    println("Downloading zip...")
-    url.openStream().use { input: InputStream ->
-      FileOutputStream(zipFile).use { output: FileOutputStream ->
-        input.copyTo(output)
-      }
-    }
-    println("Extracting zip...")
-    val destDir = file("${rootDir}/extracted_tmp")
-    destDir.deleteRecursively()
-    destDir.mkdirs()
-    
-    copy {
-      from(zipTree(zipFile))
-      into(destDir)
-    }
-    
-    println("Copying files to app directory...")
-    val mainFolder = destDir.listFiles()?.firstOrNull()
-    if (mainFolder != null) {
-      println("Found folder: ${mainFolder.name}")
-      // Copy the entire contents of app/src
-      val appSrc = file("${mainFolder.absolutePath}/app/src")
-      if (appSrc.exists()) {
-        copy {
-          from(appSrc)
-          into(file("${rootDir}/app/src"))
-        }
-      }
-      // Also copy app/build.gradle.kts and root-level properties/configs if available
-      val appBuild = file("${mainFolder.absolutePath}/app/build.gradle.kts")
-      if (appBuild.exists()) {
-        appBuild.copyTo(file("${rootDir}/app/build.gradle.kts.downloaded"), overwrite = true)
-      }
-      val mainBuild = file("${mainFolder.absolutePath}/build.gradle.kts")
-      if (mainBuild.exists()) {
-        mainBuild.copyTo(file("${rootDir}/build.gradle.kts.downloaded"), overwrite = true)
-      }
-      val settingsBuild = file("${mainFolder.absolutePath}/settings.gradle.kts")
-      if (settingsBuild.exists()) {
-        settingsBuild.copyTo(file("${rootDir}/settings.gradle.kts.downloaded"), overwrite = true)
-      }
-      val metadataJson = file("${mainFolder.absolutePath}/metadata.json")
-      if (metadataJson.exists()) {
-        metadataJson.copyTo(file("${rootDir}/metadata.json"), overwrite = true)
-      }
-    }
-    zipFile.delete()
-    destDir.deleteRecursively()
-    println("Done!")
-  }
 }
 

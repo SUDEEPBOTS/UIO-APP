@@ -1,0 +1,6 @@
+{
+  "name": "uio train",
+  "description": "Track live train running status, direct delay, platforms, and chronological station timelines of active trains in real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
